@@ -5,7 +5,7 @@
 
 import type { Language } from '@/types/clinical';
 
-type TranslationKey =
+export type TranslationKey =
   | 'appName'
   | 'welcome'
   | 'welcomeSubtitle'
@@ -50,7 +50,26 @@ type TranslationKey =
   | 'fieldUnknown'
   | 'fieldUncertain'
   | 'correctionMode'
-  | 'correctionInstruction';
+  | 'correctionInstruction'
+  // Phase 3 additions:
+  | 'addDocumentsTitle'
+  | 'addDocumentsSubtitle'
+  | 'takePhoto'
+  | 'uploadImage'
+  | 'uploadPdf'
+  | 'useDemoDocument'
+  | 'readyToProcess'
+  | 'readingDocument'
+  | 'findingMedicalInfo'
+  | 'preparingHistory'
+  | 'readyForReview'
+  | 'reviewExtractedTitle'
+  | 'confirmAction'
+  | 'editAction'
+  | 'tryAgain'
+  | 'continueWithoutDoc'
+  | 'unreadableDocError'
+  | 'processDocument';
 
 export const TRANSLATIONS: Record<Language, Record<TranslationKey, string>> = {
   en: {
@@ -100,6 +119,26 @@ export const TRANSLATIONS: Record<Language, Record<TranslationKey, string>> = {
     fieldUncertain: 'Uncertain',
     correctionMode: 'Correction Mode',
     correctionInstruction: 'Select a field below to correct your answer.',
+
+    // Phase 3
+    addDocumentsTitle: 'Add Medical Documents',
+    addDocumentsSubtitle: 'You can upload prescriptions, lab reports, scan reports, discharge summaries, or other medical records.',
+    takePhoto: 'Take Photo',
+    uploadImage: 'Upload Image',
+    uploadPdf: 'Upload PDF',
+    useDemoDocument: 'Use Demo Document',
+    readyToProcess: 'Ready to process',
+    readingDocument: 'Reading your document...',
+    findingMedicalInfo: 'Finding relevant medical information...',
+    preparingHistory: 'Preparing your medical history...',
+    readyForReview: 'Ready for review',
+    reviewExtractedTitle: 'Review Extracted Information',
+    confirmAction: 'Confirm',
+    editAction: 'Edit',
+    tryAgain: 'Try again',
+    continueWithoutDoc: 'Continue without this document',
+    unreadableDocError: "We couldn't reliably read this document.",
+    processDocument: 'Process Document',
   },
 
   te: {
@@ -149,6 +188,26 @@ export const TRANSLATIONS: Record<Language, Record<TranslationKey, string>> = {
     fieldUncertain: 'అనిశ్చితం',
     correctionMode: 'దిద్దుబాటు మోడ్',
     correctionInstruction: 'మీ జవాబు సరిచేయడానికి దిగువ ఫీల్డ్ ఎంచుకోండి.',
+
+    // Phase 3
+    addDocumentsTitle: 'వైద్య పత్రాలను జోడించండి',
+    addDocumentsSubtitle: 'మీరు ప్రిస్క్రిప్షన్‌లు, ల్యాబ్ నివేదికలు, స్కాన్ రిపోర్టులు లేదా డిశ్చార్జ్ సారాంశాలను అప్‌లోడ్ చేయవచ్చు.',
+    takePhoto: 'ఫోటో తీయండి',
+    uploadImage: 'చిత్రాన్ని అప్‌లోడ్ చేయండి',
+    uploadPdf: 'PDF అప్‌లోడ్ చేయండి',
+    useDemoDocument: 'డెమో పత్రాన్ని ఉపయోగించండి',
+    readyToProcess: 'ప్రాసెస్ చేయడానికి సిద్ధంగా ఉంది',
+    readingDocument: 'మీ పత్రాన్ని చదువుతున్నాము...',
+    findingMedicalInfo: 'వైద్య సమాచారాన్ని గుర్తిస్తున్నాము...',
+    preparingHistory: 'మీ వైద్య చరిత్రను సిద్ధం చేస్తున్నాము...',
+    readyForReview: 'సమీక్షించడానికి సిద్ధంగా ఉంది',
+    reviewExtractedTitle: 'గుర్తించిన సమాచారాన్ని సమీక్షించండి',
+    confirmAction: 'ధృవీకరించండి',
+    editAction: 'సవరించండి',
+    tryAgain: 'మళ్లీ ప్రయత్నించండి',
+    continueWithoutDoc: 'ఈ పత్రం లేకుండా కొనసాగండి',
+    unreadableDocError: 'మేము ఈ పత్రాన్ని సరిగ్గా చదవలేకపోయాము.',
+    processDocument: 'పత్రాన్ని ప్రాసెస్ చేయండి',
   },
 
   hi: {
@@ -198,6 +257,26 @@ export const TRANSLATIONS: Record<Language, Record<TranslationKey, string>> = {
     fieldUncertain: 'अनिश्चित',
     correctionMode: 'सुधार मोड',
     correctionInstruction: 'अपना उत्तर सुधारने के लिए नीचे फ़ील्ड चुनें।',
+
+    // Phase 3
+    addDocumentsTitle: 'चिकित्सा दस्तावेज़ जोड़ें',
+    addDocumentsSubtitle: 'आप नुस्खे (पर्चे), लैब रिपोर्ट, स्कैन रिपोर्ट, या डिस्चार्ज सारांश अपलोड कर सकते हैं।',
+    takePhoto: 'फोटो लें',
+    uploadImage: 'छवि अपलोड करें',
+    uploadPdf: 'PDF अपलोड करें',
+    useDemoDocument: 'डेमो दस्तावेज़ उपयोग करें',
+    readyToProcess: 'प्रोसेस करने के लिए तैयार',
+    readingDocument: 'आपके दस्तावेज़ को पढ़ा जा रहा है...',
+    findingMedicalInfo: 'चिकित्सा जानकारी खोजी जा रही है...',
+    preparingHistory: 'आपका चिकित्सा इतिहास तैयार किया जा रहा है...',
+    readyForReview: 'समीक्षा के लिए तैयार',
+    reviewExtractedTitle: 'निकाली गई जानकारी की समीक्षा करें',
+    confirmAction: 'पुष्टि करें',
+    editAction: 'संशोधित करें',
+    tryAgain: 'पुनः प्रयास करें',
+    continueWithoutDoc: 'इस दस्तावेज़ के बिना आगे बढ़ें',
+    unreadableDocError: 'हम इस दस्तावेज़ को ठीक से नहीं पढ़ सके।',
+    processDocument: 'दस्तावेज़ प्रोसेस करें',
   },
 };
 

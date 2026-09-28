@@ -141,7 +141,31 @@ export default function KioskPage() {
             }}
           />
         )}
-        {step === 'documents'  && <DocumentStep language={language} onSkip={() => setStep('review')} />}
+        {step === 'documents' && (
+          <DocumentStep
+            caseId={caseId}
+            language={language}
+            onSkip={() => setStep('review')}
+            onProceed={async () => {
+              // Refresh case details to include document findings in summary and red flags
+              try {
+                const res = await fetch(`/api/consultations/${caseId}`);
+                if (res.ok) {
+                  const updatedCase = await res.json();
+                  if (updatedCase.preliminarySummary) {
+                    setSummary(updatedCase.preliminarySummary);
+                  }
+                  if (updatedCase.redFlags) {
+                    setRedFlagCount(updatedCase.redFlags.length);
+                  }
+                }
+              } catch {
+                // proceed
+              }
+              setStep('review');
+            }}
+          />
+        )}
         {step === 'processing' && <ProcessingStep language={language} />}
         {step === 'review'     && (
           <ReviewStep language={language} summary={summary} redFlagCount={redFlagCount} onSubmit={submitToDoctor} />

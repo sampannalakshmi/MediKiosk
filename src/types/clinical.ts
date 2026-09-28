@@ -2,12 +2,15 @@
 // MediKiosk — Clinical Types
 // ─────────────────────────────────────────────────────────────────────────────
 
+import type { MedicalDocument, ClinicalConflict } from './document';
+export * from './document';
+
 export type Language = 'en' | 'te' | 'hi';
 export type InteractionMode = 'voice' | 'text' | 'touch';
 
 // ── Evidence & Confidence ────────────────────────────────────────────────────
 
-export type EvidenceSourceType = 'interview' | 'document' | 'ayush' | 'doctor';
+export type EvidenceSourceType = 'interview' | 'document' | 'ayush' | 'doctor' | 'system';
 
 export interface EvidenceSource {
   field: string;
@@ -18,6 +21,9 @@ export interface EvidenceSource {
   timestamp: string;          // ISO-8601
   confidence: number;         // 0–1
   question_id?: string;
+  document_id?: string;
+  page_number?: number;
+  snippet?: string;
 }
 
 // ── Clinical Field Status ────────────────────────────────────────────────────
@@ -100,19 +106,6 @@ export interface AYUSHHistory {
   previousAyurvedicDetails?: string;
 }
 
-// ── Medical Document ─────────────────────────────────────────────────────────
-
-export interface MedicalDocument {
-  id: string;
-  filename: string;
-  fileType: string;
-  uploadedAt: string;
-  ocrText?: string;
-  structuredData?: Record<string, unknown>;
-  documentType?: string;
-  summary?: string;
-}
-
 // ── Timeline ─────────────────────────────────────────────────────────────────
 
 export interface TimelineEvent {
@@ -121,6 +114,8 @@ export interface TimelineEvent {
   description: string;
   source: EvidenceSourceType;
   documentId?: string;
+  documentName?: string;
+  page?: number;
 }
 
 // ── Red Flags ────────────────────────────────────────────────────────────────
@@ -142,6 +137,9 @@ export interface RedFlagAlert {
   triggeredBy: string[];
   recommendedAction: string;
   timestamp: string;
+  sourceType?: 'interview' | 'document';
+  sourceDocumentId?: string;
+  sourceSnippet?: string;
 }
 
 // ── Doctor Review ─────────────────────────────────────────────────────────────
@@ -187,6 +185,7 @@ export interface ConsultationCase {
   timeline: TimelineEvent[];
   redFlags: RedFlagAlert[];
   evidenceMap: Record<string, EvidenceSource>;
+  conflicts?: ClinicalConflict[];
   preliminarySummary?: string;
   doctorReview?: DoctorReview;
   createdAt: string;
