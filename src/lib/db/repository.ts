@@ -11,6 +11,7 @@ import type {
   SOCRATESAbdominalHistory,
   TimelineEvent,
   EvidenceSource,
+  AYUSHHistory,
 } from '@/types/clinical';
 import type { MedicalDocument, DocumentExtraction, ClinicalConflict } from '@/types/document';
 import { SYNTHETIC_DEMO_DOCUMENTS } from '@/services/documents/demoDocuments';
@@ -453,6 +454,16 @@ class Repository {
       },
     };
 
+    const ayushA: AYUSHHistory = {
+      prakriti: 'Pitta-Vata predominantly',
+      agni: 'Vishama Agni (irregular digestion with post-prandial bloating)',
+      dietaryHabits: 'Irregular meal timings, spicy and fried foods (Ushna, Tikshna ahara)',
+      lifestyle: 'Sedentary desk job with high occupational stress',
+      seasonalInfluence: 'Aggravated in Varsha ritu (monsoon season)',
+      previousAyurvedicTreatment: true,
+      previousAyurvedicDetails: 'Avipattikar Churna 1 tsp at bedtime taken for 2 weeks with temporary relief',
+    };
+
     this.cases.set('case-demo-001', {
       id: 'case-demo-001',
       patientId: 'patient-001',
@@ -462,7 +473,7 @@ class Repository {
       status: 'pending_review',
       priority: 'MEDIUM',
       socratesHistory: socA,
-      ayushHistory: {},
+      ayushHistory: ayushA,
       documents: [doc1, doc2, doc3],
       timeline: timelineA,
       redFlags: [],

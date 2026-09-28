@@ -296,6 +296,33 @@ export default function CaseDetailView({ caseData: c, onUpdated }: Props) {
         <Row label="LMP" value={h.lastMenstrualPeriod} />
       </div>
 
+      {/* 🌿 AYUSH Holistic Assessment (Ministry of Ayush) */}
+      {c.ayushHistory && Object.keys(c.ayushHistory).length > 0 && (
+        <div className="bg-emerald-50/50 border border-emerald-200 rounded-2xl p-5 shadow-xs">
+          <div className="flex items-center gap-2 mb-3">
+            <span className="text-base">🌿</span>
+            <h3 className="text-sm font-bold text-emerald-950 uppercase tracking-wide">
+              AYUSH Holistic Case Assessment (Ministry of Ayush)
+            </h3>
+          </div>
+          <Row label="Prakriti (Dosha)" value={c.ayushHistory.prakriti} />
+          <Row label="Agni (Digestive Fire)" value={c.ayushHistory.agni} />
+          <Row label="Dietary Habits (Ahara)" value={c.ayushHistory.dietaryHabits} />
+          <Row label="Lifestyle (Vihara)" value={c.ayushHistory.lifestyle} />
+          <Row label="Seasonal Influence (Ritu)" value={c.ayushHistory.seasonalInfluence} />
+          <Row
+            label="Prior Ayush Treatment"
+            value={
+              c.ayushHistory.previousAyurvedicTreatment !== undefined
+                ? c.ayushHistory.previousAyurvedicTreatment
+                  ? `Yes — ${c.ayushHistory.previousAyurvedicDetails || 'Ayurvedic formulations'}`
+                  : 'None reported'
+                : undefined
+            }
+          />
+        </div>
+      )}
+
       {/* Preliminary AI Summary (Item 19) */}
       {c.preliminarySummary && (
         <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 shadow-xs">
