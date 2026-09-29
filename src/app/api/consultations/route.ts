@@ -14,6 +14,12 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
+
+  if (body.reset) {
+    repo.reset();
+    return NextResponse.json({ success: true, message: 'Reset to default synthetic demo cases' });
+  }
+
   const { patientId, name, age, gender, language, interactionMode, chiefComplaint } = body;
 
   if (!language || !chiefComplaint) {

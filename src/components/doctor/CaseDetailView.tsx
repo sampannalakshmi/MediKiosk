@@ -1,13 +1,19 @@
 'use client';
 // ─────────────────────────────────────────────────────────────────────────────
-// MediKiosk — Doctor Case Detail View (Phase 3)
-// Enhanced with Medical Documents, Conflict Alerts, Timeline, & Evidence Linking
+// MediKiosk — Doctor Case Detail View (Phase 3 Integrated)
+// Enhanced with Medical Documents, Conflict Alerts, Timeline, Evidence Linking,
+// ABDM Modal, Edit Case Modal, and Red Flag Triage Banner
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { useState } from 'react';
-import type { ConsultationCase } from '@/types/clinical';
+import type { ConsultationCase, EvidenceSource } from '@/types/clinical';
 import type { MedicalDocument } from '@/types/document';
 import DocumentViewerModal from './DocumentViewerModal';
+import AbdmModal from './AbdmModal';
+import EditCaseModal from './EditCaseModal';
+import EvidenceModal from '@/components/common/EvidenceModal';
+import RedFlagBanner from '@/components/common/RedFlagBanner';
+import { Edit3, Database, CheckCircle2, Search } from 'lucide-react';
 
 interface Props {
   caseData: ConsultationCase;
@@ -16,10 +22,13 @@ interface Props {
 
 export default function CaseDetailView({ caseData: c, onUpdated }: Props) {
   const [confirming, setConfirming] = useState(false);
-  const [notes, setNotes] = useState('');
+  const [notes, setNotes] = useState(c.doctorReview?.notes || '');
   const [showFHIR, setShowFHIR] = useState(false);
-  const [fhirData, setFhirData] = useState<object | null>(null);
+  const [showEdit, setShowEdit] = useState(false);
   const [selectedDoc, setSelectedDoc] = useState<MedicalDocument | null>(null);
+  const [selectedEvidence, setSelectedEvidence] = useState<EvidenceSource | null>(null);
+  const [selectedEvidenceField, setSelectedEvidenceField] = useState<string>('');
+  const [triageAcknowledged, setTriageAcknowledged] = useState(false);
 
   const h = c.socratesHistory;
 
@@ -34,12 +43,6 @@ export default function CaseDetailView({ caseData: c, onUpdated }: Props) {
     onUpdated();
   };
 
-  const loadFHIR = async () => {
-    const res = await fetch(`/api/abdm/simulate?caseId=${c.id}`);
-    setFhirData(await res.json());
-    setShowFHIR(true);
-  };
-
   const handleConfirmDoc = async (docId: string) => {
     await fetch(`/api/documents/${docId}/confirm`, {
       method: 'POST',
@@ -50,13 +53,32 @@ export default function CaseDetailView({ caseData: c, onUpdated }: Props) {
     onUpdated();
   };
 
-  const Row = ({ label, value }: { label: string; value?: unknown }) =>
-    value !== undefined && value !== null && value !== '' ? (
-      <div className="flex gap-3 py-1.5 border-b border-gray-100">
-        <span className="text-xs text-gray-500 w-40 shrink-0 pt-0.5">{label}</span>
-        <span className="text-sm text-gray-800 font-medium">{String(value)}</span>
+  const Row = ({ label, value, fieldKey }: { label: string; value?: unknown; fieldKey?: string }) => {
+    if (value === undefined || value === null || value === '') return null;
+    const ev = fieldKey && c.evidenceMap ? c.evidenceMap[fieldKey] : null;
+
+    return (
+      <div className="flex items-center justify-between py-1.5 border-b border-gray-100 hover:bg-slate-50/80 px-2 rounded-lg transition-colors group">
+        <div className="flex gap-3 items-center flex-1">
+          <span className="text-xs text-gray-500 w-36 shrink-0">{label}</span>
+          <span className="text-sm text-gray-800 font-medium">{String(value)}</span>
+        </div>
+        {ev ? (
+          <button
+            type="button"
+            onClick={() => {
+              setSelectedEvidence(ev);
+              setSelectedEvidenceField(label);
+            }}
+            className="text-[11px] text-teal-700 bg-teal-50 hover:bg-teal-100 border border-teal-200 px-2 py-0.5 rounded-md font-semibold opacity-80 group-hover:opacity-100 transition-opacity flex items-center gap-1 cursor-pointer"
+          >
+            <Search className="w-3 h-3" />
+            <span>Audit Evidence</span>
+          </button>
+        ) : null}
       </div>
-    ) : null;
+    );
+  };
 
   return (
     <div className="p-6 space-y-6 max-w-4xl">
@@ -74,22 +96,56 @@ export default function CaseDetailView({ caseData: c, onUpdated }: Props) {
             {c.patient?.gender ? `• ${c.patient.gender} ` : ''}• Intake Language: {c.language.toUpperCase()} • Case ID: {c.id}
           </p>
         </div>
-        <div
-          className={`px-3 py-1 rounded-full text-xs font-bold border ${
-            c.priority === 'CRITICAL'
-              ? 'bg-red-100 text-red-800 border-red-300'
-              : c.priority === 'HIGH'
-              ? 'bg-orange-100 text-orange-800 border-orange-300'
-              : c.priority === 'MEDIUM'
-              ? 'bg-yellow-100 text-yellow-800 border-yellow-300'
-              : 'bg-green-100 text-green-800 border-green-300'
-          }`}
-        >
-          {c.priority} PRIORITY
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setShowEdit(true)}
+            className="px-3 py-1.5 border border-slate-300 text-slate-700 hover:bg-slate-50 text-xs font-semibold rounded-xl flex items-center gap-1.5 transition-colors cursor-pointer"
+          >
+            <Edit3 className="w-3.5 h-3.5" />
+            <span>Edit Fields</span>
+          </button>
+          <div
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold border ${
+              c.priority === 'CRITICAL'
+                ? 'bg-red-100 text-red-800 border-red-300'
+                : c.priority === 'HIGH'
+                ? 'bg-orange-100 text-orange-800 border-orange-300'
+                : c.priority === 'MEDIUM'
+                ? 'bg-yellow-100 text-yellow-800 border-yellow-300'
+                : 'bg-green-100 text-green-800 border-green-300'
+            }`}
+          >
+            {c.priority} PRIORITY
+          </div>
         </div>
       </div>
 
-      {/* ⚠ Clinical Conflict Alert Banner (Item 16 & 27) */}
+      {/* Red Flag Alert Banner */}
+      {c.redFlags.length > 0 && !triageAcknowledged && (
+        <RedFlagBanner
+          alerts={c.redFlags}
+          isDoctorView={true}
+          onAcknowledge={() => setTriageAcknowledged(true)}
+        />
+      )}
+
+      {/* Triage Acknowledged Pill */}
+      {triageAcknowledged && (
+        <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-3 flex items-center justify-between text-xs text-emerald-800">
+          <div className="flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+            <span>Red-flag triage acknowledged by attending clinician. Prioritized bedside workup active.</span>
+          </div>
+          <button
+            onClick={() => setTriageAcknowledged(false)}
+            className="text-xs text-emerald-700 underline hover:text-emerald-900 cursor-pointer"
+          >
+            Show alert banner
+          </button>
+        </div>
+      )}
+
+      {/* Clinical Conflict Alert Banner */}
       {c.conflicts && c.conflicts.length > 0 && (
         <div className="space-y-3">
           {c.conflicts.map((conf) => (
@@ -117,136 +173,81 @@ export default function CaseDetailView({ caseData: c, onUpdated }: Props) {
         </div>
       )}
 
-      {/* Red Flags Section */}
-      {c.redFlags.length > 0 && (
-        <div className="space-y-2">
-          <h3 className="text-xs font-bold text-red-700 uppercase tracking-wider">
-            Clinical Red Flag Alerts ({c.redFlags.length})
-          </h3>
-          {c.redFlags.map((f, i) => (
-            <div
-              key={i}
-              className={`rounded-2xl p-4 border ${
-                f.severity === 'CRITICAL' ? 'bg-red-50 border-red-300' : 'bg-orange-50 border-orange-300'
-              }`}
-            >
-              <div className="flex items-center gap-2 mb-1">
-                <span className="text-lg">⚠</span>
-                <span className="font-bold text-sm text-gray-900">{f.label}</span>
-                <span
-                  className={`ml-auto text-[10px] px-2 py-0.5 rounded-full font-bold uppercase ${
-                    f.severity === 'CRITICAL' ? 'bg-red-200 text-red-900' : 'bg-orange-200 text-orange-900'
-                  }`}
-                >
-                  {f.severity}
-                </span>
-              </div>
-              <p className="text-xs text-gray-700 ml-6">{f.description}</p>
-              {f.sourceSnippet && (
-                <p className="text-[11px] font-mono text-gray-600 ml-6 mt-1 bg-white/60 p-1.5 rounded border border-gray-200">
-                  Evidence: &quot;{f.sourceSnippet}&quot;
-                </p>
-              )}
-              <p className="text-xs text-gray-900 ml-6 mt-1 font-semibold">
-                Recommended Action: {f.recommendedAction}
-              </p>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Chief Complaint */}
-      <div className="bg-blue-50/70 border border-blue-100 rounded-2xl p-4">
-        <p className="text-[11px] text-blue-600 font-bold uppercase tracking-wider">Chief Complaint</p>
-        <p className="text-base font-semibold text-blue-950 mt-0.5">{c.chiefComplaint}</p>
-      </div>
-
-      {/* 📄 Medical Documents Cards Section (Item 14) */}
-      <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-xs space-y-4">
-        <div className="flex items-center justify-between">
+      {/* Digitized Medical Documents Section */}
+      <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-xs">
+        <div className="flex items-center justify-between mb-3">
           <div>
             <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wide">
-              Medical Documents ({c.documents?.length || 0})
+              Digitized Medical Documents ({c.documents?.length || 0})
             </h3>
             <p className="text-xs text-gray-500">
-              Digitized prescriptions, lab investigations, and previous hospital summaries.
+              OCR-digitized previous prescriptions, lab reports, and imaging
             </p>
           </div>
         </div>
 
-        {(!c.documents || c.documents.length === 0) ? (
-          <p className="text-xs text-gray-400 italic py-2">No documents attached to this case.</p>
-        ) : (
+        {c.documents && c.documents.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {c.documents.map((doc) => (
               <div
                 key={doc.id}
-                className="p-4 rounded-xl border border-gray-200 bg-slate-50/50 hover:bg-slate-50 hover:border-blue-300 transition-all space-y-3 flex flex-col justify-between"
+                onClick={() => setSelectedDoc(doc)}
+                className="border border-gray-200 rounded-xl p-3.5 hover:border-blue-400 hover:bg-blue-50/30 transition-all cursor-pointer group"
               >
-                <div className="space-y-1">
-                  <div className="flex items-start justify-between gap-2">
-                    <h4 className="font-bold text-xs text-gray-900 line-clamp-1">{doc.filename}</h4>
-                    <span
-                      className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase shrink-0 ${
-                        doc.reviewStatus === 'verified'
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-yellow-100 text-yellow-800'
-                      }`}
-                    >
-                      {doc.reviewStatus === 'verified' ? '● Verified' : '● Needs review'}
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="text-2xl">
+                      {doc.documentType === 'prescription' ? '💊' : doc.documentType === 'lab_report' ? '🧪' : '📄'}
                     </span>
+                    <div>
+                      <p className="text-xs font-bold text-gray-800 group-hover:text-blue-700">
+                        {doc.filename}
+                      </p>
+                      <p className="text-[11px] text-gray-500">
+                        {doc.documentDate || 'Undated'} • {doc.documentType.replace('_', ' ')}
+                      </p>
+                    </div>
                   </div>
-                  <div className="text-[11px] text-gray-500">
-                    <span className="capitalize">{doc.documentType.replace(/_/g, ' ')}</span> • {doc.documentDate || 'Recent'}
-                  </div>
-                  <p className="text-xs text-gray-600 line-clamp-2 pt-1">{doc.summary}</p>
+                  <span
+                    className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase ${
+                      doc.reviewStatus === 'verified'
+                        ? 'bg-green-100 text-green-800'
+                        : doc.reviewStatus === 'rejected'
+                        ? 'bg-red-100 text-red-800'
+                        : 'bg-yellow-100 text-yellow-800'
+                    }`}
+                  >
+                    {doc.reviewStatus || 'pending review'}
+                  </span>
                 </div>
 
-                <div className="pt-2 border-t border-gray-200 flex items-center justify-between">
-                  <span className="text-[11px] font-semibold text-blue-700">
-                    {doc.extractions?.length || 0} clinical facts extracted
+                <div className="mt-2.5 pt-2 border-t border-gray-100 flex items-center justify-between text-[11px]">
+                  <span className="text-gray-500">{doc.extractions?.length || 0} extracted facts</span>
+                  <span className="text-blue-600 font-semibold group-hover:underline">
+                    Inspect &amp; Verify →
                   </span>
-                  <button
-                    onClick={() => setSelectedDoc(doc)}
-                    className="px-3 py-1 bg-white hover:bg-blue-50 border border-blue-200 text-blue-700 rounded-lg text-xs font-semibold shadow-2xs transition-colors"
-                  >
-                    View Document →
-                  </button>
                 </div>
               </div>
             ))}
           </div>
+        ) : (
+          <p className="text-xs text-gray-400 italic">No medical documents uploaded for this case.</p>
         )}
       </div>
 
-      {/* ⏱ Patient Timeline Section (Item 17) */}
-      <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-xs space-y-3">
-        <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wide">
-          Patient Clinical Timeline
+      {/* Clinical Timeline */}
+      <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-xs">
+        <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wide mb-3">
+          Chronological Clinical Timeline
         </h3>
-        <p className="text-xs text-gray-500">
-          Chronological clinical events merged across interview statements and medical records.
-        </p>
-
-        {(!c.timeline || c.timeline.length === 0) ? (
-          <p className="text-xs text-gray-400 italic">No timeline events recorded.</p>
-        ) : (
-          <div className="relative pl-6 space-y-4 border-l-2 border-slate-200 ml-2 mt-3">
-            {c.timeline.map((evt, idx) => (
-              <div key={idx} className="relative group">
-                {/* Dot */}
-                <div
-                  className={`absolute -left-[31px] top-1 w-3.5 h-3.5 rounded-full border-2 border-white shadow-xs ${
-                    evt.source === 'document'
-                      ? 'bg-emerald-500'
-                      : evt.source === 'interview'
-                      ? 'bg-blue-500'
-                      : 'bg-purple-500'
-                  }`}
-                />
-                <div className="space-y-0.5">
-                  <div className="flex items-center gap-2">
-                    <span className="font-mono text-xs font-bold text-slate-700">{evt.date}</span>
+        {c.timeline && c.timeline.length > 0 && (
+          <div className="relative pl-6 border-l-2 border-blue-200 space-y-4">
+            {c.timeline.map((evt, i) => (
+              <div key={i} className="relative">
+                <div className="absolute -left-[31px] top-0 w-3.5 h-3.5 rounded-full bg-blue-500 border-2 border-white shadow-xs" />
+                <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-200">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-[11px] font-mono text-slate-500">{evt.date}</span>
                     <span
                       className={`text-[10px] px-2 py-0.2 rounded-full font-bold uppercase ${
                         evt.source === 'document'
@@ -269,34 +270,37 @@ export default function CaseDetailView({ caseData: c, onUpdated }: Props) {
 
       {/* SOCRATES Clinical History */}
       <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-xs">
-        <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wide mb-3">
-          SOCRATES Clinical History
-        </h3>
-        <Row label="Site" value={h.site} />
-        <Row label="Radiation" value={h.radiation} />
-        <Row label="Onset" value={h.onset} />
-        <Row label="Duration" value={h.onsetDuration} />
-        <Row label="Context" value={h.onsetContext} />
-        <Row label="Character" value={h.character} />
-        <Row label="Time course" value={h.timeCourse} />
-        <Row label="Trend" value={h.progressionTrend} />
-        <Row label="Severity" value={h.severity !== undefined ? `${h.severity}/10` : undefined} />
-        <Row label="Nausea" value={h.nausea !== undefined ? (h.nausea ? 'Yes' : 'No') : undefined} />
-        <Row label="Vomiting" value={h.vomiting !== undefined ? (h.vomiting ? 'Yes' : 'No') : undefined} />
-        <Row label="Fever" value={h.fever !== undefined ? (h.fever ? `Yes${h.feverDegree ? ` (${h.feverDegree})` : ''}` : 'No') : undefined} />
-        <Row label="Diarrhoea" value={h.diarrhoea !== undefined ? (h.diarrhoea ? 'Yes' : 'No') : undefined} />
-        <Row label="Blood in stool" value={h.bloodInStool !== undefined ? (h.bloodInStool ? '⚠ Yes' : 'No') : undefined} />
-        <Row label="Jaundice" value={h.jaundice !== undefined ? (h.jaundice ? 'Yes' : 'No') : undefined} />
-        <Row label="Exacerbating" value={h.exacerbatingFactors?.join(', ')} />
-        <Row label="Relieving" value={h.relievingFactors?.join(', ')} />
-        <Row label="Past similar" value={h.similarEpisodesBefore !== undefined ? (h.similarEpisodesBefore ? 'Yes' : 'No') : undefined} />
-        <Row label="Prior surgery" value={h.previousAbdominalSurgery !== undefined ? (h.previousAbdominalSurgery ? 'Yes' : 'No') : undefined} />
-        <Row label="Medications" value={h.relevantMedications?.join(', ')} />
-        <Row label="Allergies" value={h.allergies} />
-        <Row label="LMP" value={h.lastMenstrualPeriod} />
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wide">
+            SOCRATES Clinical History
+          </h3>
+          <span className="text-xs text-slate-400">Hover rows to audit evidence</span>
+        </div>
+        <Row label="Site" value={h.site} fieldKey="site" />
+        <Row label="Radiation" value={h.radiation} fieldKey="radiation" />
+        <Row label="Onset" value={h.onset} fieldKey="onset" />
+        <Row label="Duration" value={h.onsetDuration} fieldKey="onsetDuration" />
+        <Row label="Context" value={h.onsetContext} fieldKey="onsetContext" />
+        <Row label="Character" value={h.character} fieldKey="character" />
+        <Row label="Time course" value={h.timeCourse} fieldKey="timeCourse" />
+        <Row label="Trend" value={h.progressionTrend} fieldKey="progressionTrend" />
+        <Row label="Severity" value={h.severity !== undefined ? `${h.severity}/10` : undefined} fieldKey="severity" />
+        <Row label="Nausea" value={h.nausea !== undefined ? (h.nausea ? 'Yes' : 'No') : undefined} fieldKey="nausea" />
+        <Row label="Vomiting" value={h.vomiting !== undefined ? (h.vomiting ? 'Yes' : 'No') : undefined} fieldKey="vomiting" />
+        <Row label="Fever" value={h.fever !== undefined ? (h.fever ? `Yes${h.feverDegree ? ` (${h.feverDegree})` : ''}` : 'No') : undefined} fieldKey="fever" />
+        <Row label="Diarrhoea" value={h.diarrhoea !== undefined ? (h.diarrhoea ? 'Yes' : 'No') : undefined} fieldKey="diarrhoea" />
+        <Row label="Blood in stool" value={h.bloodInStool !== undefined ? (h.bloodInStool ? '⚠ Yes' : 'No') : undefined} fieldKey="bloodInStool" />
+        <Row label="Jaundice" value={h.jaundice !== undefined ? (h.jaundice ? 'Yes' : 'No') : undefined} fieldKey="jaundice" />
+        <Row label="Exacerbating" value={h.exacerbatingFactors?.join(', ')} fieldKey="exacerbatingFactors" />
+        <Row label="Relieving" value={h.relievingFactors?.join(', ')} fieldKey="relievingFactors" />
+        <Row label="Past similar" value={h.similarEpisodesBefore !== undefined ? (h.similarEpisodesBefore ? 'Yes' : 'No') : undefined} fieldKey="similarEpisodesBefore" />
+        <Row label="Prior surgery" value={h.previousAbdominalSurgery !== undefined ? (h.previousAbdominalSurgery ? 'Yes' : 'No') : undefined} fieldKey="previousAbdominalSurgery" />
+        <Row label="Medications" value={h.relevantMedications?.join(', ')} fieldKey="relevantMedications" />
+        <Row label="Allergies" value={h.allergies} fieldKey="allergies" />
+        <Row label="LMP" value={h.lastMenstrualPeriod} fieldKey="lastMenstrualPeriod" />
       </div>
 
-      {/* 🌿 AYUSH Holistic Assessment (Ministry of Ayush) */}
+      {/* AYUSH Holistic Assessment */}
       {c.ayushHistory && Object.keys(c.ayushHistory).length > 0 && (
         <div className="bg-emerald-50/50 border border-emerald-200 rounded-2xl p-5 shadow-xs">
           <div className="flex items-center gap-2 mb-3">
@@ -305,11 +309,11 @@ export default function CaseDetailView({ caseData: c, onUpdated }: Props) {
               AYUSH Holistic Case Assessment (Ministry of Ayush)
             </h3>
           </div>
-          <Row label="Prakriti (Dosha)" value={c.ayushHistory.prakriti} />
-          <Row label="Agni (Digestive Fire)" value={c.ayushHistory.agni} />
-          <Row label="Dietary Habits (Ahara)" value={c.ayushHistory.dietaryHabits} />
-          <Row label="Lifestyle (Vihara)" value={c.ayushHistory.lifestyle} />
-          <Row label="Seasonal Influence (Ritu)" value={c.ayushHistory.seasonalInfluence} />
+          <Row label="Prakriti (Dosha)" value={c.ayushHistory.prakriti} fieldKey="prakriti" />
+          <Row label="Agni (Digestive Fire)" value={c.ayushHistory.agni} fieldKey="agni" />
+          <Row label="Dietary Habits (Ahara)" value={c.ayushHistory.dietaryHabits} fieldKey="dietaryHabits" />
+          <Row label="Lifestyle (Vihara)" value={c.ayushHistory.lifestyle} fieldKey="lifestyle" />
+          <Row label="Seasonal Influence (Ritu)" value={c.ayushHistory.seasonalInfluence} fieldKey="seasonalInfluence" />
           <Row
             label="Prior Ayush Treatment"
             value={
@@ -323,12 +327,17 @@ export default function CaseDetailView({ caseData: c, onUpdated }: Props) {
         </div>
       )}
 
-      {/* Preliminary AI Summary (Item 19) */}
+      {/* Integrated Clinical Summary */}
       {c.preliminarySummary && (
         <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 shadow-xs">
-          <h3 className="text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">
-            Integrated Clinical Summary (Interview + Documents)
-          </h3>
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="text-xs font-bold text-slate-600 uppercase tracking-wider">
+              Integrated Clinical Summary (Interview + Documents)
+            </h3>
+            <span className="text-[11px] px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 font-semibold">
+              Clinician Editable
+            </span>
+          </div>
           <pre className="whitespace-pre-wrap text-xs text-gray-800 font-mono leading-relaxed bg-white p-3.5 rounded-xl border border-slate-200">
             {c.preliminarySummary}
           </pre>
@@ -357,15 +366,16 @@ export default function CaseDetailView({ caseData: c, onUpdated }: Props) {
         <button
           onClick={confirm}
           disabled={confirming}
-          className="px-6 py-3 bg-green-600 text-white rounded-xl font-semibold hover:bg-green-700 disabled:opacity-50 transition-colors text-sm shadow-xs"
+          className="px-6 py-3 bg-green-600 text-white rounded-xl font-semibold hover:bg-green-700 disabled:opacity-50 transition-colors text-sm shadow-xs cursor-pointer"
         >
           {confirming ? 'Confirming...' : '✓ Confirm & Sign Off Case'}
         </button>
         <button
-          onClick={loadFHIR}
-          className="px-5 py-3 border border-blue-400 text-blue-700 bg-blue-50/50 hover:bg-blue-50 rounded-xl font-semibold text-sm transition-colors"
+          onClick={() => setShowFHIR(true)}
+          className="px-5 py-3 border border-emerald-500 text-emerald-700 bg-emerald-50/50 hover:bg-emerald-100 rounded-xl font-semibold text-sm transition-colors flex items-center gap-1.5 cursor-pointer"
         >
-          📋 View ABDM FHIR Bundle
+          <Database className="w-4 h-4" />
+          <span>View ABDM FHIR Bundle</span>
         </button>
       </div>
 
@@ -378,21 +388,33 @@ export default function CaseDetailView({ caseData: c, onUpdated }: Props) {
         />
       )}
 
-      {/* FHIR Modal */}
-      {showFHIR && fhirData && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-6 max-w-2xl w-full max-h-[80vh] overflow-auto shadow-xl">
-            <div className="flex justify-between items-center mb-4 border-b pb-2">
-              <h3 className="font-bold text-gray-900 text-sm">FHIR R4 Bundle (ABDM Simulation)</h3>
-              <button onClick={() => setShowFHIR(false)} className="text-gray-400 hover:text-gray-600">
-                ✕
-              </button>
-            </div>
-            <pre className="text-xs text-gray-700 font-mono whitespace-pre-wrap">
-              {JSON.stringify(fhirData, null, 2)}
-            </pre>
-          </div>
-        </div>
+      {/* ABDM FHIR Modal */}
+      {showFHIR && (
+        <AbdmModal
+          isOpen={showFHIR}
+          onClose={() => setShowFHIR(false)}
+          consultation={c}
+        />
+      )}
+
+      {/* Clinician Field Editor Modal */}
+      {showEdit && (
+        <EditCaseModal
+          isOpen={showEdit}
+          onClose={() => setShowEdit(false)}
+          consultation={c}
+          onSaved={() => onUpdated()}
+        />
+      )}
+
+      {/* Evidence Chain Inspector Modal */}
+      {selectedEvidence && (
+        <EvidenceModal
+          isOpen={!!selectedEvidence}
+          onClose={() => setSelectedEvidence(null)}
+          evidence={selectedEvidence}
+          fieldName={selectedEvidenceField}
+        />
       )}
     </div>
   );

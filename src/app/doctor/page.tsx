@@ -21,15 +21,58 @@ function DoctorPortal() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      {/* Header */}
-      <header className="bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between shadow-sm">
+      {/* Header with Navigation Switcher */}
+      <header className="sticky top-0 z-40 bg-white border-b border-gray-200 px-4 sm:px-6 py-3 flex items-center justify-between shadow-sm">
         <div className="flex items-center gap-3">
-          <span className="text-blue-700 text-xl font-bold">🏥 MediKiosk</span>
-          <span className="text-sm font-semibold text-gray-700 border-l border-gray-300 pl-3">Doctor Portal</span>
+          <a href="/" className="flex items-center gap-2">
+            <span className="text-blue-700 text-xl font-bold">🏥 MediKiosk</span>
+          </a>
+          <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-semibold">
+            SIH 2026 · Ayush #26047
+          </span>
+          <span className="hidden md:inline-block text-xs text-gray-500 border-l border-gray-200 pl-3">
+            Physician Intake &amp; Triage Portal
+          </span>
         </div>
+
+        {/* Center: Non-diagnostic assurance */}
+        <div className="hidden lg:flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-medium border border-slate-200">
+          <span className="text-emerald-600">🛡</span>
+          <span>Verified Clinician Review View · English Translation Mode</span>
+        </div>
+
+        {/* Right: Actions & View Switcher */}
         <div className="flex items-center gap-3">
-          <span className="text-xs text-gray-400">Dashboard is in English regardless of patient language</span>
-          <a href="/" className="text-xs text-blue-600 underline">← Patient Kiosk</a>
+          <button
+            type="button"
+            onClick={async () => {
+              if (confirm('Reset prototype state to default synthetic demo cases?')) {
+                await fetch('/api/consultations', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ reset: true }),
+                }).catch(() => {});
+                setRefreshKey(k => k + 1);
+                setSelected(null);
+              }
+            }}
+            className="text-xs text-slate-500 hover:text-slate-800 px-2.5 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors"
+            title="Reset synthetic demo cases"
+          >
+            ↻ Reset Demo Data
+          </button>
+
+          <div className="flex bg-slate-100 p-1 rounded-xl border border-slate-200 text-xs font-semibold">
+            <a
+              href="/"
+              className="px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition-colors"
+            >
+              ← Patient Kiosk
+            </a>
+            <span className="px-3 py-1.5 rounded-lg bg-blue-700 text-white shadow-xs">
+              Doctor Portal
+            </span>
+          </div>
         </div>
       </header>
 

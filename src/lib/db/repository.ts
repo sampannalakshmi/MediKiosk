@@ -121,6 +121,13 @@ class Repository {
     return null;
   }
 
+  // ── Reset ──────────────────────────────────────────────────────────────────
+  reset() {
+    this.patients.clear();
+    this.cases.clear();
+    this.seed();
+  }
+
   // ── Seed ───────────────────────────────────────────────────────────────────
 
   private seed() {

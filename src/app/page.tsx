@@ -82,15 +82,35 @@ export default function KioskPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white">
-      {/* Top bar */}
-      <header className="bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between shadow-sm">
+      {/* Top bar with Navigation Switcher */}
+      <header className="sticky top-0 z-40 bg-white border-b border-gray-200 px-4 sm:px-6 py-3 flex items-center justify-between shadow-sm">
         <div className="flex items-center gap-2">
           <span className="text-blue-700 text-xl font-bold">🏥 MediKiosk</span>
-          <span className="hidden sm:inline text-xs bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full font-medium">Ministry of Ayush · SIH 2026</span>
+          <span className="hidden sm:inline text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-semibold">
+            SIH 2026 · Ayush #26047
+          </span>
         </div>
-        {step !== 'welcome' && step !== 'submitted' && (
-          <a href="/doctor" className="text-xs text-gray-400 hover:text-gray-600 underline">Doctor Portal →</a>
-        )}
+
+        {/* Center: Non-diagnostic assurance */}
+        <div className="hidden md:flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-medium border border-slate-200">
+          <span className="text-emerald-600">🛡</span>
+          <span>Assistive Case-Taking Only · Clinician Always Confirms</span>
+        </div>
+
+        {/* Right: View Switcher */}
+        <div className="flex items-center gap-2">
+          <div className="flex bg-slate-100 p-1 rounded-xl border border-slate-200 text-xs font-semibold">
+            <span className="px-3 py-1.5 rounded-lg bg-blue-600 text-white shadow-xs">
+              Patient Kiosk
+            </span>
+            <a
+              href="/doctor"
+              className="px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition-colors"
+            >
+              Doctor Portal →
+            </a>
+          </div>
+        </div>
       </header>
 
       {/* Step progress dots */}
@@ -106,7 +126,13 @@ export default function KioskPage() {
 
       {/* Step content */}
       <main className="px-4 py-6">
-        {step === 'welcome'    && <WelcomeStep language={language} onNext={() => setStep('language')} />}
+        {step === 'welcome' && (
+          <WelcomeStep
+            language={language}
+            onNext={() => setStep('language')}
+            onLanguageChange={(lang) => setLanguage(lang)}
+          />
+        )}
         {step === 'language'   && <LanguageStep onSelect={lang => { setLanguage(lang); setStep('consent'); }} />}
         {step === 'consent'    && <ConsentStep language={language} onAccept={() => setStep('patient_id')} />}
         {step === 'patient_id' && (
