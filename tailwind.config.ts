@@ -6,9 +6,23 @@ const config: Config = {
     './src/components/**/*.{js,ts,jsx,tsx,mdx}',
     './src/app/**/*.{js,ts,jsx,tsx,mdx}',
   ],
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {
+        dark: {
+          950: '#070b14',
+          900: '#0b1120',
+          850: '#0f172a',
+          800: '#1e293b',
+          700: '#334155',
+          600: '#475569',
+        },
+        cyan: {
+          400: '#22d3ee',
+          500: '#06b6d4',
+          600: '#0891b2',
+        },
         medical: {
           50: '#f0f9ff',
           100: '#e0f2fe',
@@ -35,39 +49,32 @@ const config: Config = {
           900: '#14532d',
           950: '#052e16',
         },
-        clinical: {
-          50: '#f8fafc',
-          100: '#f1f5f9',
-          200: '#e2e8f0',
-          300: '#cbd5e1',
-          400: '#94a3b8',
-          500: '#64748b',
-          600: '#475569',
-          700: '#334155',
-          800: '#1e293b',
-          900: '#0f172a',
-          950: '#020617',
-        },
       },
       fontFamily: {
         sans: ['"Plus Jakarta Sans"', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
         mono: ['"JetBrains Mono"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
       },
       boxShadow: {
-        'card': '0 2px 8px -1px rgba(15, 23, 42, 0.06), 0 1px 4px -1px rgba(15, 23, 42, 0.04)',
-        'card-hover': '0 12px 24px -4px rgba(15, 23, 42, 0.1), 0 4px 12px -2px rgba(15, 23, 42, 0.05)',
-        'glow-blue': '0 0 24px -4px rgba(14, 165, 233, 0.35)',
-        'glow-emerald': '0 0 24px -4px rgba(16, 185, 129, 0.35)',
-        'glow-red': '0 0 24px -4px rgba(239, 68, 68, 0.35)',
+        'glow-cyan': '0 0 25px -4px rgba(6, 182, 212, 0.45)',
+        'glow-teal': '0 0 25px -4px rgba(20, 184, 166, 0.45)',
+        'glow-emerald': '0 0 25px -4px rgba(16, 185, 129, 0.45)',
+        'glow-btn': '0 0 24px -2px rgba(6, 182, 212, 0.5), 0 8px 16px -4px rgba(0, 0, 0, 0.6)',
+        'card-dark': '0 4px 20px -2px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05)',
+        'card-hover-dark': '0 12px 32px -4px rgba(6, 182, 212, 0.15), 0 0 0 1px rgba(6, 182, 212, 0.3)',
       },
       animation: {
         'pulse-subtle': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
         'float': 'float 3s ease-in-out infinite',
+        'glow': 'glow 2s ease-in-out infinite alternate',
       },
       keyframes: {
         float: {
           '0%, 100%': { transform: 'translateY(0px)' },
           '50%': { transform: 'translateY(-6px)' },
+        },
+        glow: {
+          '0%': { boxShadow: '0 0 15px rgba(6, 182, 212, 0.3)' },
+          '100%': { boxShadow: '0 0 30px rgba(6, 182, 212, 0.7)' },
         },
       },
     },

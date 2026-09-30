@@ -51,25 +51,27 @@ export default function WelcomeStep({ language, onNext, onLanguageChange }: Welc
 
   return (
     <div className="max-w-4xl mx-auto py-2 sm:py-6">
-      {/* ── Main Glassmorphic Hero Card ─────────────────────────────────────── */}
-      <div className="bg-white/95 rounded-3xl shadow-xl shadow-slate-900/5 border border-slate-200/90 overflow-hidden relative backdrop-blur-xl">
-        {/* Decorative Top Accent Stripe */}
-        <div className="h-2 w-full bg-gradient-to-r from-medical-600 via-teal-500 to-ayush-500" />
+      {/* ── Main Dark Glassmorphic Hero Card ───────────────────────────────── */}
+      <div className="dark-glass-card rounded-3xl overflow-hidden relative border border-slate-800 shadow-2xl shadow-cyan-950/20 text-center">
+        {/* Ambient Top Glow Effect */}
+        <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-96 h-48 bg-cyan-500/15 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-24 right-10 w-80 h-48 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
 
-        <div className="p-6 sm:p-12 text-center">
-          {/* Top Bar: Official Trust Header & Accessibility Sound */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8 pb-6 border-b border-slate-100">
+        <div className="p-6 sm:p-12 relative z-10">
+          {/* Top Bar: Ministry Trust Badge & Accessibility Sound */}
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8 pb-6 border-b border-slate-800/80">
             {/* National / Ayush Trust Badge */}
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-xl bg-ayush-50 text-ayush-700 flex items-center justify-center border border-ayush-200">
-                <Building2 className="w-4 h-4" />
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-2xl bg-emerald-950/60 text-emerald-400 flex items-center justify-center border border-emerald-800/60 shadow-inner">
+                <Building2 className="w-5 h-5" />
               </div>
               <div className="text-left">
-                <div className="text-[11px] font-bold uppercase tracking-wider text-slate-900">
-                  Ministry of Ayush · SIH 2026
+                <div className="text-xs font-bold uppercase tracking-wider text-white flex items-center gap-1.5">
+                  <span>Ministry of Ayush · SIH 2026</span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
                 </div>
-                <div className="text-[10px] text-slate-500">
-                  Problem ID: 26047 · Patient Case-Taking Terminal
+                <div className="text-[11px] text-slate-400 font-mono">
+                  Problem ID: 26047 · Patient Case-Taking Software
                 </div>
               </div>
             </div>
@@ -77,14 +79,14 @@ export default function WelcomeStep({ language, onNext, onLanguageChange }: Welc
             {/* Language Switcher & Audio Narration */}
             <div className="flex items-center gap-2">
               {onLanguageChange && (
-                <div className="inline-flex bg-slate-100 p-1 rounded-2xl border border-slate-200 text-xs font-bold shadow-inner">
+                <div className="inline-flex bg-slate-950/80 p-1 rounded-2xl border border-slate-800 text-xs font-bold shadow-inner">
                   <button
                     type="button"
                     onClick={() => onLanguageChange('en')}
-                    className={`px-3 py-1.5 rounded-xl transition-all ${
+                    className={`px-3 py-1.5 rounded-xl transition-all cursor-pointer ${
                       language === 'en'
-                        ? 'bg-medical-600 text-white shadow-xs'
-                        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60'
+                        ? 'bg-cyan-500 text-slate-950 font-black shadow-md shadow-cyan-500/30'
+                        : 'text-slate-400 hover:text-white'
                     }`}
                   >
                     English
@@ -92,10 +94,10 @@ export default function WelcomeStep({ language, onNext, onLanguageChange }: Welc
                   <button
                     type="button"
                     onClick={() => onLanguageChange('te')}
-                    className={`px-3 py-1.5 rounded-xl transition-all ${
+                    className={`px-3 py-1.5 rounded-xl transition-all cursor-pointer ${
                       language === 'te'
-                        ? 'bg-medical-600 text-white shadow-xs'
-                        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60'
+                        ? 'bg-cyan-500 text-slate-950 font-black shadow-md shadow-cyan-500/30'
+                        : 'text-slate-400 hover:text-white'
                     }`}
                   >
                     తెలుగు
@@ -103,10 +105,10 @@ export default function WelcomeStep({ language, onNext, onLanguageChange }: Welc
                   <button
                     type="button"
                     onClick={() => onLanguageChange('hi')}
-                    className={`px-3 py-1.5 rounded-xl transition-all ${
+                    className={`px-3 py-1.5 rounded-xl transition-all cursor-pointer ${
                       language === 'hi'
-                        ? 'bg-medical-600 text-white shadow-xs'
-                        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60'
+                        ? 'bg-cyan-500 text-slate-950 font-black shadow-md shadow-cyan-500/30'
+                        : 'text-slate-400 hover:text-white'
                     }`}
                   >
                     हिन्दी
@@ -120,87 +122,87 @@ export default function WelcomeStep({ language, onNext, onLanguageChange }: Welc
                 title="Audio instructions narration"
                 className={`p-2.5 rounded-2xl border transition-all flex items-center gap-1.5 text-xs font-semibold cursor-pointer ${
                   isSpeaking
-                    ? 'bg-amber-100 text-amber-900 border-amber-300 animate-pulse'
-                    : 'bg-medical-50 text-medical-700 hover:bg-medical-100 border-medical-200'
+                    ? 'bg-amber-500/20 text-amber-300 border-amber-500/50 animate-pulse'
+                    : 'bg-slate-900/80 text-cyan-400 hover:text-cyan-300 border-slate-800 hover:border-cyan-500/40'
                 }`}
               >
-                {isSpeaking ? <VolumeX className="w-4 h-4 text-amber-700" /> : <Volume2 className="w-4 h-4" />}
-                <span className="hidden md:inline">{isSpeaking ? 'Stop Audio' : 'Audio Narration'}</span>
+                {isSpeaking ? <VolumeX className="w-4 h-4 text-amber-400" /> : <Volume2 className="w-4 h-4 text-cyan-400" />}
+                <span className="hidden md:inline">{isSpeaking ? 'Stop Audio' : 'Narration'}</span>
               </button>
             </div>
           </div>
 
-          {/* Central Medical Glow Icon */}
+          {/* Central Medical Neon Glowing Emblem */}
           <div className="relative inline-block mb-6">
-            <div className="w-24 h-24 mx-auto rounded-3xl bg-gradient-to-tr from-medical-600 via-medical-500 to-teal-400 flex items-center justify-center text-white shadow-xl shadow-medical-500/25">
+            <div className="w-24 h-24 mx-auto rounded-3xl bg-gradient-to-tr from-cyan-500 via-teal-500 to-emerald-400 flex items-center justify-center text-slate-950 shadow-2xl shadow-cyan-500/30 animate-float">
               <Stethoscope className="w-12 h-12" />
             </div>
-            <span className="absolute -bottom-2 -right-2 px-2.5 py-0.5 rounded-full bg-emerald-500 text-white text-[10px] font-bold border-2 border-white shadow-sm flex items-center gap-1">
+            <span className="absolute -bottom-2 -right-2 px-2.5 py-0.5 rounded-full bg-emerald-500 text-slate-950 text-[10px] font-black border-2 border-slate-900 shadow-md flex items-center gap-1">
               <CheckCircle2 className="w-3 h-3" />
-              <span>Verified Kiosk</span>
+              <span>Certified Terminal</span>
             </span>
           </div>
 
           {/* Title & Subtitle */}
-          <h1 className="text-3xl sm:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight">
+          <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight leading-tight">
             {t(language, 'appName')}
           </h1>
-          <p className="text-base sm:text-xl font-semibold text-medical-700 mt-2">
+          <p className="text-base sm:text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-teal-300 to-emerald-400 mt-2">
             AI-Assisted Clinical History &amp; Pre-Consultation Platform
           </p>
-          <p className="text-sm sm:text-base text-slate-600 max-w-2xl mx-auto mt-3 leading-relaxed">
+          <p className="text-sm sm:text-base text-slate-300 max-w-2xl mx-auto mt-3 leading-relaxed">
             {language === 'te'
               ? 'వైద్యుడిని సంప్రదించడానికి ముందు మీ ఆరోగ్య చరిత్ర, లక్షణాలు మరియు పాత నివేదికలను సులభంగా నమోదు చేసుకోండి. ఇది మీ విలువైన సంప్రదింపు సమయాన్ని ఆదా చేస్తుంది.'
               : language === 'hi'
               ? 'डॉक्टर से परामर्श से पहले अपने स्वास्थ्य का इतिहास, लक्षण और पुरानी रिपोर्ट सुरक्षित रूप से दर्ज करें। यह आपके परामर्श के समय की बचत करता है।'
-              : 'Digital pre-consultation case-taking supporting multilingual voice, touch interactions, document OCR, and ABDM FHIR health record synthesis.'}
+              : 'Digital pre-consultation case-taking supporting voice, touch, document OCR digitization, and national ABDM FHIR health record synthesis.'}
           </p>
 
           {/* Feature Highlights Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 my-8 text-left">
-            <div className="p-4 sm:p-5 rounded-2xl bg-slate-50/80 border border-slate-200 hover:border-medical-300 hover:bg-white transition-all shadow-xs group">
-              <div className="w-10 h-10 rounded-xl bg-medical-100 text-medical-700 flex items-center justify-center mb-3">
+            <div className="p-4 sm:p-5 rounded-2xl bg-slate-900/60 border border-slate-800 dark-glass-card-hover group">
+              <div className="w-10 h-10 rounded-xl bg-cyan-950/80 text-cyan-400 flex items-center justify-center mb-3 border border-cyan-800/60">
                 <Clock className="w-5 h-5 group-hover:scale-110 transition-transform" />
               </div>
-              <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wide">
+              <h4 className="text-xs font-bold text-white uppercase tracking-wider">
                 Faster Clinical Triage
               </h4>
-              <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+              <p className="text-xs text-slate-400 mt-1 leading-relaxed">
                 Structures the SOCRATES symptom profile prior to physician examination.
               </p>
             </div>
 
-            <div className="p-4 sm:p-5 rounded-2xl bg-slate-50/80 border border-slate-200 hover:border-teal-300 hover:bg-white transition-all shadow-xs group">
-              <div className="w-10 h-10 rounded-xl bg-teal-100 text-teal-700 flex items-center justify-center mb-3">
+            <div className="p-4 sm:p-5 rounded-2xl bg-slate-900/60 border border-slate-800 dark-glass-card-hover group">
+              <div className="w-10 h-10 rounded-xl bg-teal-950/80 text-teal-400 flex items-center justify-center mb-3 border border-teal-800/60">
                 <FileText className="w-5 h-5 group-hover:scale-110 transition-transform" />
               </div>
-              <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wide">
-                Medical Document OCR
+              <h4 className="text-xs font-bold text-white uppercase tracking-wider">
+                Document OCR &amp; Facts
               </h4>
-              <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+              <p className="text-xs text-slate-400 mt-1 leading-relaxed">
                 Instantly digitizes lab reports, past prescriptions, and previous diagnoses.
               </p>
             </div>
 
-            <div className="p-4 sm:p-5 rounded-2xl bg-slate-50/80 border border-slate-200 hover:border-ayush-300 hover:bg-white transition-all shadow-xs group">
-              <div className="w-10 h-10 rounded-xl bg-ayush-100 text-ayush-700 flex items-center justify-center mb-3">
+            <div className="p-4 sm:p-5 rounded-2xl bg-slate-900/60 border border-slate-800 dark-glass-card-hover group">
+              <div className="w-10 h-10 rounded-xl bg-emerald-950/80 text-emerald-400 flex items-center justify-center mb-3 border border-emerald-800/60">
                 <Sparkles className="w-5 h-5 group-hover:scale-110 transition-transform" />
               </div>
-              <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wide">
-                AYUSH Holistic Intake
+              <h4 className="text-xs font-bold text-white uppercase tracking-wider">
+                AYUSH Holistic Profile
               </h4>
-              <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+              <p className="text-xs text-slate-400 mt-1 leading-relaxed">
                 Integrates Prakriti, Agni, Ahara, and Vihara lifestyle factors seamlessly.
               </p>
             </div>
           </div>
 
-          {/* Primary Call to Action Button */}
+          {/* Primary Attractive Glowing Call to Action Button */}
           <div className="pt-2">
             <button
               type="button"
               onClick={onNext}
-              className="w-full sm:w-auto px-10 py-4.5 bg-gradient-to-r from-medical-600 via-medical-700 to-indigo-700 hover:from-medical-700 hover:to-indigo-800 text-white text-base sm:text-lg font-bold rounded-2xl shadow-xl shadow-medical-600/30 flex items-center justify-center mx-auto space-x-3 transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
+              className="btn-glow-primary w-full sm:w-auto px-10 py-5 rounded-2xl text-base sm:text-lg flex items-center justify-center mx-auto space-x-3 cursor-pointer group"
             >
               <span>
                 {language === 'te'
@@ -209,15 +211,15 @@ export default function WelcomeStep({ language, onNext, onLanguageChange }: Welc
                   ? 'शुरू करें (Start Case Intake)'
                   : 'Start Patient Case Intake'}
               </span>
-              <ArrowRight className="w-5 h-5 animate-pulse" />
+              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </button>
           </div>
 
           {/* Non-Diagnostic Safety Seal */}
-          <div className="mt-8 pt-6 border-t border-slate-100 flex items-start sm:items-center justify-center gap-3 text-xs text-slate-500 max-w-xl mx-auto">
-            <ShieldCheck className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5 sm:mt-0" />
+          <div className="mt-8 pt-6 border-t border-slate-800/80 flex items-start sm:items-center justify-center gap-3 text-xs text-slate-400 max-w-xl mx-auto">
+            <ShieldCheck className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5 sm:mt-0" />
             <p className="text-left leading-relaxed">
-              <strong className="text-slate-700">Strict Clinical Safety Principle:</strong> MediKiosk collects and structures clinical history. It does not diagnose, prescribe, or replace a medical doctor.
+              <strong className="text-slate-200">Strict Clinical Safety Principle:</strong> MediKiosk collects and structures clinical history. It does not diagnose, prescribe, or replace a medical doctor.
             </p>
           </div>
         </div>
